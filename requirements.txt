@@ -1,0 +1,10 @@
+gradio
+torch
+diffusers
+transformers
+accelerate
+fastapi
+python-dotenv
+Pillow
+requests
+GPUtil
