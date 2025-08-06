@@ -2,14 +2,13 @@ import os
 import requests
 import io
 import base64
+import time
 from PIL import Image
-from dotenv import load_dotenv
 
-# Ortam değişkenlerini yükle
-load_dotenv()
-REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
+# API token'ı direkt ortam değişkeninden al
+REPLICATE_API_TOKEN = os.environ.get("REPLICATE_API_TOKEN")
 
-# Replicate API endpoint ve header bilgileri
+# Replicate API endpoint ve headers
 REPLICATE_ENDPOINT = "https://api.replicate.com/v1/predictions"
 HEADERS = {
     "Authorization": f"Token {REPLICATE_API_TOKEN}",
@@ -20,9 +19,8 @@ HEADERS = {
 REPLICATE_MODEL_VERSION = "a9758cb0db18592e06a11558869b5a3fe2549f23402d408b7879b3c5cddc1b1"
 
 def replicate_img2img_generate(init_image: Image.Image, prompt: str, strength: float = 0.6, guidance_scale: float = 7.5):
-    # API token kontrolü
     if not REPLICATE_API_TOKEN:
-        return None, "❌ REPLICATE_API_TOKEN bulunamadı. `.env` dosyasını kontrol et."
+        return None, "❌ REPLICATE_API_TOKEN bulunamadı. GitHub Secrets veya sistem ortam değişkeni eksik."
 
     if init_image is None or not prompt:
         return None, "⚠️ Görsel ve prompt girmeniz gerekiyor."
@@ -34,7 +32,7 @@ def replicate_img2img_generate(init_image: Image.Image, prompt: str, strength: f
         image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
         image_uri = f"data:image/png;base64,{image_base64}"
 
-        # İstek verisi
+        # API'ye istek verisi
         data = {
             "version": REPLICATE_MODEL_VERSION,
             "input": {
@@ -45,16 +43,15 @@ def replicate_img2img_generate(init_image: Image.Image, prompt: str, strength: f
             }
         }
 
-        # API çağrısı
+        # İsteği gönder
         response = requests.post(REPLICATE_ENDPOINT, headers=HEADERS, json=data)
         if response.status_code != 201:
             return None, f"❌ API Hatası: {response.status_code} - {response.text}"
 
-        # Sonuç URL'si
+        # Sonuç URL’si
         prediction_url = response.json()["urls"]["get"]
 
-        # 60 saniye kadar sonucu bekle
-        import time
+        # Sonucu bekle (60 saniye timeout)
         start_time = time.time()
         while True:
             poll = requests.get(prediction_url, headers=HEADERS).json()

@@ -1,10 +1,10 @@
-# Python 3.10 slim imajı
+# ✅ Python 3.10 slim imajı
 FROM python:3.10-slim
 
-# Log'ları anlık görmek için
+# ✅ Log'ları anlık görebilmek için
 ENV PYTHONUNBUFFERED=1
 
-# Sisteme gerekli temel paketleri kur
+# ✅ Gerekli sistem paketleri
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
@@ -13,25 +13,20 @@ RUN apt-get update && \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Çalışma klasörünü oluştur
+# ✅ Çalışma dizini
 WORKDIR /app
 
-# requirements.txt'yi kopyala
+# ✅ requirements.txt'yi kopyala ve kur
 COPY requirements.txt .
-
-# pip'i güncelle + bağımlılıkları kur
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pythonhosted.org \
     -r requirements.txt
 
-# Uygulama dosyalarını kopyala
+# ✅ Tüm uygulama dosyalarını kopyala
 COPY . .
 
-# ✅ .env dosyasını image içine kopyala (REPLICATE_API_TOKEN için)
-COPY .env .env
-
-# Port aç
+# ✅ Port aç
 EXPOSE 7860
 
-# Başlangıç komutu
+# ✅ Başlangıç komutu
 CMD ["python", "img2img_app.py"]

@@ -27,3 +27,4 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: mertsavaserr/img2img-ai:latest
+          # NOT: .env dosyası kullanılmıyor, bu yüzden `env` dosyasını kopyalamaya çalışmak yok!
