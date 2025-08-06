@@ -27,6 +27,9 @@ RUN pip install --upgrade pip && \
 # Uygulama dosyalarını kopyala
 COPY . .
 
+# ✅ .env dosyasını image içine kopyala (REPLICATE_API_TOKEN için)
+COPY .env .env
+
 # Port aç
 EXPOSE 7860
 
